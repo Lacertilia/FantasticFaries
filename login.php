@@ -7,9 +7,10 @@
 </head>
 <body>
 	<?php 
+		include 'db.php';
 		if(isset($_POST['submit'])){
 
-			include 'db.php';
+			
 
 			
 
@@ -34,15 +35,17 @@
 
 		echo "<pre>" . print_r($_POST, 1) . "</pre>";
 		}else if(isset($_POST['newUser'])){
-			$stmt = $pdo->prepare(INSERT INTO `login` (`id`, `username`, `password`, `email`) VALUES (NULL, $_POST['username'], $_POST['password'], $_POST['email']));
 
-			$stmt->bindParam('username', $username);
-			$stmt->bindParam('password', $password);
-			$stmt->bindParam('email', $email);
+			$stmt = $pdo->prepare("INSERT INTO login ('id', 'username', 'password', 'email') VALUES (null, :username, :password, :email)");
+
+			$stmt->bindParam(':username', $username);
+			$stmt->bindParam(':password', $password);
+			$stmt->bindParam(':email', $email);
 
 			$username = $_POST['username'];
 			$password = $_POST['password'];
 			$email = $_POST['email'];
+			echo $username . "" . $password . " " . $email;
 			$stmt->execute();
 		}else{
 			echo "<h1>Nu har du gjort fel!</h1>";
