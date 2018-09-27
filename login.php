@@ -7,13 +7,12 @@
 </head>
 <body>
 	<?php 
-		if(isset($_POST['submit'])){
-
-			include 'db.php';
+	include 'db.php';
+		if(isset($_POST['submit'])) {
 
 			
 
-			if(isset($_POST['username']) && isset($_POST['password'])){
+			if(isset($_POST['username']) && isset($_POST['password'])) {
 
 				$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
 				$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -25,16 +24,31 @@
 				
 				echo $password;
 
-				if($username == $row['username'] && $password == password_verify($row['password'], $password)){
+				if($username == $row['username'] && $password == password_verify($row['password'], $password)) {
 					echo "<h1>Rätt login</h1>";
-				}else{
+
+				} else {
 					echo "<h1>Fel</h1>";
+
 				}
 			}
 
-		echo "<pre>" . print_r($_POST, 1) . "</pre>";
-		}else if(isset($_POST['newUser'])){
-			$stmt = $pdo->prepare(INSERT INTO `login` (`id`, `username`, `password`, `email`) VALUES (NULL, $_POST['username'], $_POST['password'], $_POST['email']));
+			echo "<pre>" . print_r($_POST, 1) . "</pre>";
+		} else if (isset($_POST['updatePass'])) {
+			$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
+			$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+			
+			$sql = "UPDATE login SET password='$password' WHERE username='$username'";
+			
+			$stmt = $dbh->prepare($sql);
+
+			$stmt->execute();
+
+			echo $stmt->rowCount() . " update succ";
+		} 
+		/*
+		else if (isset($_POST['newUser'])) {
+			$stmt = $dbh->prepare(INSERT INTO `login` (`id`, `username`, `password`, `email`) VALUES (NULL, $_POST['username'], $_POST['password'], $_POST['email']));
 
 			$stmt->bindParam('username', $username);
 			$stmt->bindParam('password', $password);
@@ -44,7 +58,9 @@
 			$password = $_POST['password'];
 			$email = $_POST['email'];
 			$stmt->execute();
-		}else{
+		} 
+		*/
+		else {
 			echo "<h1>Nu har du gjort fel!</h1>";
 		}
 	?>	
