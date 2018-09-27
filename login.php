@@ -36,7 +36,16 @@
 			}
 
 
-		}else if(isset($_POST['newUser'])){
+		}else if (isset($_POST['updatePass'])) {
+			$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
+			$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+			
+			$sql = "UPDATE login SET password='$password' WHERE username='$username'";
+			
+			$stmt = $dbh->prepare($sql);
+			$stmt->execute();
+			echo $stmt->rowCount() . " update succ";
+		} else if(isset($_POST['newUser'])){
 
 			$usernamePost = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
 			$passwordPost = password_hash($_POST['password'], PASSWORD_DEFAULT);
