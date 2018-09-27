@@ -6,6 +6,7 @@
 	<title>Login</title>
 </head>
 <body>
+	
 	<?php 
 		include 'db.php';
 		if(isset($_POST['submit'])){
@@ -17,27 +18,28 @@
 			if(isset($_POST['username']) && isset($_POST['password'])){
 
 				$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
-				$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+				$password = $_POST['password'];
 
-				$statement = $pdo->query("SELECT * FROM login");
-				$row = $statement->fetch(PDO::FETCH_ASSOC);
-
-				echo "<pre>" . print_r($row, 1) . "</pre>";
+				$stmt = $dbh->query("SELECT * FROM login WHERE username = :username");
+				$stmt->bindParam(':username', $username);
+				$stmt->execute();
 				
-				echo $password;
+				$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 				if($username == $row['username'] && $password == password_verify($password, $row['password'])){
 					echo "<h1>Rätt login</h1>";
+					echo "<form action='' method='POST'><input type='submit' name='delete' id='delete' value='Ta bort användare'></form>";
+
 				}else{
 					echo "<h1>Fel</h1>";
 				}
 			}
 
-		echo "<pre>" . print_r($_POST, 1) . "</pre>";
+
 		}else if(isset($_POST['newUser'])){
 
-			$usernamePost = $_POST['username'];
-			$passwordPost = $_POST['password'];
+			$usernamePost = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+			$passwordPost = password_hash($_POST['password'], PASSWORD_DEFAULT);
 			$emailPost = $_POST['email'];
 
 
@@ -48,10 +50,24 @@
 			$stmt->bindParam(':email', $emailPost);
 
 			$stmt->execute();
-				
+
+		}else if(isset($_POST['delete'])){
+			$username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+			$stmt = $dbh->prepare("SELECT id FROM login WHERE username = :username");
+			$stmt->bindParam(':username', $username);
+			$stmt->execute();
+			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			deleteAccount($row['id'], $dbh);
 		}else{
 			echo "<h1>Nu har du gjort fel!</h1>";
 		}
+
+		function deleteAccount($id, PDO $dbh) {
+            $stmt = $dbh->prepare("DELETE FROM login WHERE id = :id");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+    	}
 	?>	
 
 </body>
