@@ -26,7 +26,7 @@
 				
 				echo $password;
 
-				if($username == $row['username'] && $password == password_verify($row['password'], $password)){
+				if($username == $row['username'] && $password == password_verify($password, $row['password'])){
 					echo "<h1>Rätt login</h1>";
 				}else{
 					echo "<h1>Fel</h1>";
@@ -37,20 +37,18 @@
 		}else if(isset($_POST['newUser'])){
 
 			$usernamePost = $_POST['username'];
-			$usernamePost = $_POST['password'];
+			$passwordPost = $_POST['password'];
 			$emailPost = $_POST['email'];
 
-			$stmt = $pdo->prepare("INSERT INTO login ('id', 'username', 'password', 'email') VALUES (null, :username, :password, :email)");
 
-			$stmt->bindParam(':username', $username);
-			$stmt->bindParam(':password', $password);
-			$stmt->bindParam(':email', $email);
+			$stmt = $dbh->prepare("INSERT INTO login (username, password, email) VALUES (:username, :password, :email)");			
 
-			$username = $usernamePost;
-			$password = $passwordPost;
-			$email = $emailPost;
-			echo $username . " " . $password . " " . $email;
+			$stmt->bindParam(':username', $usernamePost);
+			$stmt->bindParam(':password', $passwordPost);
+			$stmt->bindParam(':email', $emailPost);
+
 			$stmt->execute();
+				
 		}else{
 			echo "<h1>Nu har du gjort fel!</h1>";
 		}
