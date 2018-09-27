@@ -7,8 +7,10 @@
 </head>
 <body>
 	<?php 
-	include 'db.php';
-		if(isset($_POST['submit'])) {
+		include 'db.php';
+		if(isset($_POST['submit'])){
+
+			
 
 			
 
@@ -24,7 +26,7 @@
 				
 				echo $password;
 
-				if($username == $row['username'] && $password == password_verify($row['password'], $password)) {
+				if($username == $row['username'] && $password == password_verify($password, $row['password'])){
 					echo "<h1>Rätt login</h1>";
 
 				} else {
@@ -46,21 +48,24 @@
 
 			echo $stmt->rowCount() . " update succ";
 		} 
-		/*
+		
 		else if (isset($_POST['newUser'])) {
 			$stmt = $dbh->prepare(INSERT INTO `login` (`id`, `username`, `password`, `email`) VALUES (NULL, $_POST['username'], $_POST['password'], $_POST['email']));
 
-			$stmt->bindParam('username', $username);
-			$stmt->bindParam('password', $password);
-			$stmt->bindParam('email', $email);
+			$usernamePost = $_POST['username'];
+			$passwordPost = $_POST['password'];
+			$emailPost = $_POST['email'];
 
-			$username = $_POST['username'];
-			$password = $_POST['password'];
-			$email = $_POST['email'];
+
+			$stmt = $dbh->prepare("INSERT INTO login (username, password, email) VALUES (:username, :password, :email)");			
+
+			$stmt->bindParam(':username', $usernamePost);
+			$stmt->bindParam(':password', $passwordPost);
+			$stmt->bindParam(':email', $emailPost);
+
 			$stmt->execute();
-		} 
-		*/
-		else {
+				
+		}else{
 			echo "<h1>Nu har du gjort fel!</h1>";
 		}
 	?>	
