@@ -11,23 +11,20 @@
 		include 'db.php';
 		if(isset($_POST['submit'])){
 
-			
-
-			
-
 			if(isset($_POST['username']) && isset($_POST['password'])){
 
-				$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
+				$filteredUsername = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
 				$password = $_POST['password'];
 
 				$stmt = $dbh->query("SELECT * FROM login WHERE username = :username");
-				$stmt->bindParam(':username', $username);
+				$stmt->bindParam(':username', $filteredUsername);
 				$stmt->execute();
 				
 				$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-				if($username == $row['username'] && $password == password_verify($password, $row['password'])){
+				if(password_verify($password, $row['password'])){
 					echo "<h1>Rätt login</h1>";
+					header('');
 					echo "<form action='' method='POST'><input type='submit' name='delete' id='delete' value='Ta bort användare'></form>";
 
 				}else{
@@ -37,16 +34,15 @@
 
 
 		}else if (isset($_POST['updatePass'])) {
-			$username = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
+			$filteredUsername = filter_input(INPUT_POST, "username", FILTER_SANITIZE_STRING);
 			$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 			
-			$sql = "UPDATE login SET password='$password' WHERE username='$username'";
+			$sql = "UPDATE login SET password='$password' WHERE username='$filteredUsername'";
 			
 			$stmt = $dbh->prepare($sql);
 			$stmt->execute();
 			echo $stmt->rowCount() . " update succ";
 		} else if(isset($_POST['newUser'])){
-
 			$usernamePost = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
 			$passwordPost = password_hash($_POST['password'], PASSWORD_DEFAULT);
 			$emailPost = $_POST['email'];
@@ -61,9 +57,9 @@
 			$stmt->execute();
 
 		}else if(isset($_POST['delete'])){
-			$username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+			$filteredUsername = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
 			$stmt = $dbh->prepare("SELECT id FROM login WHERE username = :username");
-			$stmt->bindParam(':username', $username);
+			$stmt->bindParam(':username', $filteredUsername);
 			$stmt->execute();
 			$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
